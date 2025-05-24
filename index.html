@@ -12,12 +12,12 @@
 <dialog id=createChatAnswer>
 <div>paste recived answer</div>
 <input id=pasteRecivedAnswer value="" autocomplete="off"/>
-<button onclick="newChatConnection.reciveAnswer(pasteRecivedAnswer.value), closeAllModals()">Done</button>
+<button onclick="newChatConnection.reciveAnswer(pasteRecivedAnswer.value), addPerson(), closeAllModals()">Done</button>
 </dialog>
 <dialog id=joinChat>
 <div>paste recived offer</div>
 <input id=pasteRecivedOffer value="" autocomplete="off"/>
-<button onclick="joinChatAnswer.showModal(), newChatConnection.reciveOffer(pasteRecivedOffer.value, function b(e){sendLocalAnswer.value = e})">Done</button>
+<button onclick="joinChatAnswer.showModal(), newChatConnection.reciveOffer(pasteRecivedOffer.value, function b(e){sendLocalAnswer.value = e, addPerson()})">Done</button>
 </dialog>
 <dialog id=joinChatAnswer>
 <div>send local answer</div>
@@ -56,24 +56,72 @@ function b(e){
   chat1.reciveAnswer(e)
 }
 */
-chat = null
-
+/*
 function create() {
-  chat = new Connection((e)=>{console.log("onmessage1", e)}, (e)=>{console.log("onopen1", e),chat1.sendMessage("open1."+Math.random())})
-  chat.localOffer(a)
+  let chat1 = new Connection((e)=>{console.log("onmessage1", e)}, (e)=>{console.log("onopen1", e),chat1.sendMessage("open1."+Math.random())})
+  chat1.localOffer(a)
   function a(e){
     console.log("localOffer", e)
     prompt("send local offer", e)
-    chat.reciveAnswer(prompt("paste recived answer"))
+    chat1.reciveAnswer(prompt("paste recived answer"))
   }
-
+}
 function join() {
-  chat = new Connection((e)=>{console.log("onmessage2", e)}, (e)=>{console.log("onopen2", e),chat1.sendMessage("open2."+Math.random())})
-  chat.reciveOffer(prompt("paste recived offer"), b)
+  let chat1 = new Connection((e)=>{console.log("onmessage2", e)}, (e)=>{console.log("onopen2", e),chat1.sendMessage("open2."+Math.random())})
+  chat1.reciveOffer(prompt("paste recived offer"), b)
   function b(e){
     console.log("reciveOffer", e)
     prompt("send local answer", e)
   }
+}
+*/
+
+let currentChat = ""
+let name = ""
+let logs = {}
+let newChatConnection = {}
+let persons = {}
+
+function create() {
+  lname = "Unknown"+(select.options.length+1)
+  name = lname
+  logs[lname] = []
+  newChatConnection = new Connection((e)=>{
+    console.log("onmessage1", e)
+    logs[lname].push(e.data)
+    if (currentChat==lname) loadChat(lname)
+  }, (e)=>{console.log("onopen1", e)})//,newChatConnection.sendMessage("open1."+Math.random())
+  newChatConnection.localOffer(a)
+  function a(e){
+    sendLocalOffer.value = e
+  }
+}
+
+function join() {
+  lname = "Unknown"+(select.options.length+1)
+  name = lname
+  logs[lname] = []
+  newChatConnection = new Connection((e)=>{
+    console.log("onmessage2", e)
+    logs[lname].push(e.data)
+    if (currentChat==lname) loadChat(lname)
+  }, (e)=>{console.log("onopen2", e)})//,newChatConnection.sendMessage("open2."+Math.random())
+}
+
+function addPerson() {
+  let option = document.createElement("option")
+  select.appendChild(option)
+  let v = Number(select.options.length)
+  option.innerHTML = name
+  persons[name] = {chat: newChatConnection, logs: logs[name]}
+  loadChat(name)
+}
+
+function loadChat(name) {
+console.log(name)
+  select.value = name
+  currentChat = name
+  chatLogs.innerHTML=persons[name].logs.join("<br>")
 }
 
 textarea.onkeypress = function(e) {
@@ -82,6 +130,7 @@ textarea.onkeypress = function(e) {
     persons[currentChat]?.chat.sendMessage("unknown:"+textarea.value)
     persons[currentChat]?.logs.push("localUser:"+textarea.value)
     textarea.value = ""
+    loadChat(currentChat)
   }
 }
 
@@ -96,5 +145,4 @@ function closeAllModals() {
   joinChat.close()
   joinChatAnswer.close()
 }
-
 </script>
