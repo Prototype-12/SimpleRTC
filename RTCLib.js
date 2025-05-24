@@ -1,5 +1,5 @@
 class Connection {
-  cfg = {iceServers: [{url: "stun:stun.gmx.net"}]}
+  cfg = {iceServers: [{urls: "stun:stun.gmx.net"}]}
   con = {optional: [{DtlsSrtpKeyAgreement: true}]}
   sdpConstraints = {optional: []}
 
