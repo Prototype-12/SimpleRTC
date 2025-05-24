@@ -11,12 +11,12 @@
 </dialog>
 <dialog id=createChatAnswer>
 <div>paste recived answer</div>
-<input id=pasteRecivedAnswer value=""/>
+<input id=pasteRecivedAnswer value="" autocomplete="off"/>
 <button onclick="newChatConnection.reciveAnswer(pasteRecivedAnswer.value), addPerson(), closeAllModals()">Done</button>
 </dialog>
 <dialog id=joinChat>
 <div>paste recived offer</div>
-<input id=pasteRecivedOffer value=""/>
+<input id=pasteRecivedOffer value="" autocomplete="off"/>
 <button onclick="joinChatAnswer.showModal(), newChatConnection.reciveOffer(pasteRecivedOffer.value, function b(e){sendLocalAnswer.value = e, addPerson()})">Done</button>
 </dialog>
 <dialog id=joinChatAnswer>
